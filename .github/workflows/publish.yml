@@ -9,6 +9,9 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
 
     steps:
     - name: Checkout repository
@@ -33,5 +36,18 @@ jobs:
     - name: Pack NuGet package
       run: dotnet pack src/Senviok/Senviok.csproj --configuration Release --no-build --output ./artifacts
 
+    - name: NuGet login (OIDC Trusted Publishing)
+      id: login
+      uses: NuGet/login@v1
+      continue-on-error: true
+      with:
+        user: chekwube
+
     - name: Publish to NuGet
-      run: dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+      run: |
+        API_KEY="${{ steps.login.outputs.NUGET_API_KEY }}"
+        if [ -z "$API_KEY" ]; then
+          API_KEY="${{ secrets.NUGET_API_KEY }}"
+        fi
+        dotnet nuget push ./artifacts/*.nupkg --api-key "$API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
+
