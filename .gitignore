@@ -1,0 +1,23 @@
+## Build and output
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+dist/
+*.nupkg
+*.snupkg
+
+## User-specific and IDE files
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.idea/
+
+## Testing and coverage
+TestResults/
+*.trx
+coverage.cobertura.xml
+
