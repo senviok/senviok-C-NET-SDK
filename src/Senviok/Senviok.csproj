@@ -17,7 +17,8 @@
     <Description>Official .NET SDK for the Senviok API - Transactional Email, SMS, WhatsApp, OTP, Webhooks, Templates, Audiences, and Domains.</Description>
     <PackageTags>senviok;email;sms;whatsapp;otp;messaging;transactional;webhooks</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/Chekwube-Manuel/senviok-sdk-csharp</RepositoryUrl>
+    <RepositoryUrl>https://github.com/senviok/senviok-C-NET-SDK.git</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/senviok/senviok-C-NET-SDK</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
