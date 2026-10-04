@@ -2,6 +2,8 @@
 
 Official .NET / C# SDK for the **Senviok** communications infrastructure platform. Seamlessly integrate transactional **Email**, **SMS**, **WhatsApp**, **OTP**, **Webhooks**, **Templates**, **Audiences**, and **Domains** into your .NET applications.
 
+[![NuGet Version](https://img.shields.io/nuget/v/Senviok.svg)](https://www.nuget.org/packages/Senviok)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/Senviok.svg)](https://www.nuget.org/packages/Senviok)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![.NET Multi-Target](https://img.shields.io/badge/.NET-netstandard2.0%20%7C%20net8.0%20%7C%20net10.0-purple.svg)](https://dotnet.microsoft.com/)
 
