@@ -130,13 +130,21 @@ var email = await client.Emails.SendAsync(new SendEmailRequest
     AddUnsubscribeFooter = true,
     Attachments = new List<EmailAttachment>
     {
-        new()
-        {
-            Filename = "invoice.pdf",
-            Content = Convert.ToBase64String(pdfBytes),
-            ContentType = "application/pdf"
-        }
+        EmailAttachment.FromBytes("invoice.pdf", pdfBytes, "application/pdf")
     }
+});
+```
+
+Each attachment can use base64 `Content` or a public HTTPS `Path` (exactly one). Set `ContentId` to embed an image using `cid:` in the HTML. For larger files, upload multipart field `file` to `POST /v1/emails/attachments` and pass returned IDs through `AttachmentIds`. The API allows up to 10 files and 10 MB total per email.
+
+```csharp
+var uploaded = await client.Emails.UploadAttachmentAsync("invoice.pdf", pdfBytes, "application/pdf");
+await client.Emails.SendAsync(new SendEmailRequest
+{
+    From = "billing@acme.com",
+    To = "alice@example.com",
+    Subject = "Your invoice",
+    AttachmentIds = new List<string> { uploaded.Id }
 });
 ```
 

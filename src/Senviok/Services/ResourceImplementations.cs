@@ -28,6 +28,13 @@ internal class EmailsResource : IEmailsResource
         if (request == null) throw new ArgumentNullException(nameof(request));
         return _client.SendAsync<SendEmailRequest, SendEmailResponse>(HttpMethod.Post, "emails", request, options, cancellationToken);
     }
+
+    public Task<UploadedEmailAttachment> UploadAttachmentAsync(string filename, byte[] content, string contentType = "application/octet-stream", SenviokRequestOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(filename)) throw new ArgumentException("A filename is required.", nameof(filename));
+        if (content == null || content.Length == 0) throw new ArgumentException("Attachment content cannot be empty.", nameof(content));
+        return _client.SendMultipartAsync<UploadedEmailAttachment>("emails/attachments", filename, content, contentType, options, cancellationToken);
+    }
 }
 
 internal class SmsResource : ISmsResource

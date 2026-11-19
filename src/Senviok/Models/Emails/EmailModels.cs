@@ -49,6 +49,9 @@ public class SendEmailRequest
 
     /// <summary>Optional list of email file attachments.</summary>
     public List<EmailAttachment>? Attachments { get; set; }
+
+    /// <summary>IDs returned by POST /v1/emails/attachments.</summary>
+    public List<string>? AttachmentIds { get; set; }
 }
 
 /// <summary>
@@ -64,6 +67,31 @@ public class EmailAttachment
 
     /// <summary>MIME content type (e.g. "application/pdf").</summary>
     public string? ContentType { get; set; }
+
+    /// <summary>Public HTTPS URL for the file. Mutually exclusive with Content.</summary>
+    public string? Path { get; set; }
+
+    /// <summary>Content-ID for inline images referenced as cid:... in the email HTML.</summary>
+    public string? ContentId { get; set; }
+
+    /// <summary>Creates an inline attachment and base64-encodes the file bytes.</summary>
+    public static EmailAttachment FromBytes(string filename, byte[] content, string? contentType = null) => new()
+    {
+        Filename = filename,
+        Content = Convert.ToBase64String(content),
+        ContentType = contentType
+    };
+}
+
+/// <summary>Metadata returned when an attachment is uploaded for later sending.</summary>
+public class UploadedEmailAttachment
+{
+    public string Id { get; set; } = string.Empty;
+    public string Filename { get; set; } = string.Empty;
+    public string ContentType { get; set; } = string.Empty;
+    public long SizeBytes { get; set; }
+    public string? Bucket { get; set; }
+    public string? Key { get; set; }
 }
 
 /// <summary>

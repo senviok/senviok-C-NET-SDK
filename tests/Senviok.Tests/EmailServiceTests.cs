@@ -1,10 +1,47 @@
 using System.Net;
+using System.Text;
 using Senviok.Models.Emails;
 
 namespace Senviok.Tests;
 
 public class EmailServiceTests
 {
+    [Fact]
+    public async Task UploadAttachmentThenSendUsesReturnedAttachmentId()
+    {
+        var requests = new List<(string Path, string ContentType, string Body)>();
+        var handler = new TestHttpMessageHandler(req =>
+        {
+            var body = req.Content?.ReadAsStringAsync().GetAwaiter().GetResult() ?? string.Empty;
+            requests.Add((req.RequestUri!.AbsolutePath, req.Content?.Headers.ContentType?.MediaType ?? string.Empty, body));
+            var response = req.RequestUri.AbsolutePath.EndsWith("/emails/attachments")
+                ? "{\"id\":\"att_1\",\"filename\":\"invoice.pdf\",\"contentType\":\"application/pdf\",\"sizeBytes\":3,\"bucket\":\"test\",\"key\":\"test/att_1\"}"
+                : "{\"id\":\"msg_1\"}";
+            return new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(response, Encoding.UTF8, "application/json")
+            };
+        });
+
+        using var client = new SenviokClient("svk_test_key", new SenviokClientOptions { HttpMessageHandler = handler });
+        var uploaded = await client.Emails.UploadAttachmentAsync("invoice.pdf", [1, 2, 3], "application/pdf");
+        var sent = await client.Emails.SendAsync(new SendEmailRequest
+        {
+            From = "billing@example.com", To = "customer@example.com", Subject = "Invoice",
+            AttachmentIds = [uploaded.Id]
+        });
+
+        Assert.Equal("msg_1", sent.Id);
+        Assert.Equal(2, requests.Count);
+        Assert.Equal("/v1/emails/attachments", requests[0].Path);
+        Assert.Equal("multipart/form-data", requests[0].ContentType);
+        Assert.True(requests[0].Body.Contains("name=file", StringComparison.OrdinalIgnoreCase)
+            || requests[0].Body.Contains("name=\"file\"", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains("invoice.pdf", requests[0].Body);
+        Assert.Equal("/v1/emails", requests[1].Path);
+        Assert.Contains("\"attachmentIds\":[\"att_1\"]", requests[1].Body);
+    }
+
     [Fact]
     public async Task SendAsync_SendsPostRequestWithExpectedJsonPayload()
     {

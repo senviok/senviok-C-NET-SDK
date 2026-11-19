@@ -16,6 +16,7 @@ namespace Senviok.Services;
 public interface IEmailsResource
 {
     Task<SendEmailResponse> SendAsync(SendEmailRequest request, SenviokRequestOptions? options = null, CancellationToken cancellationToken = default);
+    Task<UploadedEmailAttachment> UploadAttachmentAsync(string filename, byte[] content, string contentType = "application/octet-stream", SenviokRequestOptions? options = null, CancellationToken cancellationToken = default);
 }
 
 public interface ISmsResource

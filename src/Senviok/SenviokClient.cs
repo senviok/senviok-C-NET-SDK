@@ -175,6 +175,31 @@ public sealed class SenviokClient : ISenviokClient
             ?? throw new SenviokApiException("Failed to deserialize API response.", response.StatusCode, responseBody);
     }
 
+    internal async Task<TResponse> SendMultipartAsync<TResponse>(
+        string path,
+        string filename,
+        byte[] content,
+        string contentType,
+        SenviokRequestOptions? requestOptions = null,
+        CancellationToken cancellationToken = default)
+    {
+        using var request = CreateRequest(HttpMethod.Post, path, requestOptions);
+        var fileContent = new ByteArrayContent(content);
+        fileContent.Headers.ContentType = new MediaTypeHeaderValue(contentType);
+        var form = new MultipartFormDataContent();
+        form.Add(fileContent, "file", Path.GetFileName(filename));
+        request.Content = form;
+
+        using var response = await _http.SendAsync(request, cancellationToken).ConfigureAwait(false);
+        var responseBody = await ReadContentAsync(response, cancellationToken).ConfigureAwait(false);
+        if (!response.IsSuccessStatusCode)
+        {
+            throw SenviokExceptionFactory.Create(response, responseBody);
+        }
+        return JsonSerializer.Deserialize<TResponse>(responseBody, JsonDefaults.Options)
+            ?? throw new SenviokApiException("Failed to deserialize API response.", response.StatusCode, responseBody);
+    }
+
     internal async Task<IReadOnlyList<T>> SendListAsync<T>(
         HttpMethod method,
         string path,
